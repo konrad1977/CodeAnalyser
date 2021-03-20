@@ -51,7 +51,21 @@ let fileInfos: [FileInfo] = CodeAnalyser()
   .unsafeRun()
 ```
 
-#### FileInfo model
+#### Analysing a singlefile
+Synchronous:
+
+```swift
+func analyseSourcefile(_ filename: String, filedata: String, filetype: Filetype) ->IO<Fileinfo>
+```
+Asynchronous:
+
+```swift
+func analyseSourcefileAsync(_ filename: String, filedata: String, filetype: Filetype) ->Deferred<Fileinfo>
+```
+
+### Models
+
+#### FileInfo
 ```swift
 public struct Fileinfo {
   public let filename: String
@@ -67,20 +81,7 @@ public struct Fileinfo {
 }
 ```
 
-
-#### Analysing a singlefile
-Synchronous:
-
-```swift
-func analyseSourcefile(_ filename: String, filedata: String, filetype: Filetype) ->IO<Fileinfo>
-```
-Asynchronous:
-
-```swift
-func analyseSourcefileAsync(_ filename: String, filedata: String, filetype: Filetype) ->Deferred<Fileinfo>
-```
-
-#### Filetype Model
+#### Filetype
 An enum to show wich language (or all/none)
 
 ```swift
@@ -93,7 +94,7 @@ public enum Filetype {
 }
 ```
 
-#### Language Summary Model
+#### Language Summary
 Language Summary holds the information about every language. 
 Filetype will tell you which language it is.
 
@@ -112,7 +113,7 @@ public struct LanguageSummary {
 }
 ```
 
-#### Statistics Model
+#### Statistics
 Will return the percentage based on linecount.  Filetype will tell you which language it is.
 
 ```swift
