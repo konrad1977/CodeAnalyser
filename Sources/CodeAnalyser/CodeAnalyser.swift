@@ -8,7 +8,7 @@
 import Foundation
 
 fileprivate extension Predicate where A == String {
-	static var supportedFiletypes = Predicate {
+	static var allSupportedFileTypes = Predicate {
 		$0.hasSuffix(".swift") ||
 			$0.hasSuffix(".m") ||
 			$0.hasSuffix(".h") ||
@@ -16,19 +16,36 @@ fileprivate extension Predicate where A == String {
 			$0.hasSuffix(".ktm") ||
 			$0.hasSuffix(".kts")
 	}
+
+	static func supportedFileTypes(from fileType: Filetype) -> Predicate<String> {
+		switch fileType {
+		case .all:
+			return allSupportedFileTypes
+		case .kotlin:
+			return Predicate { $0.hasSuffix(".kt") || $0.hasSuffix(".ktm") || $0.hasSuffix(".kts") }
+		case .swift:
+			return Predicate { $0.hasSuffix(".swift") }
+		case .objectiveC:
+			return Predicate { $0.hasSuffix(".m") || $0.hasSuffix(".h") }
+		case .none:
+			return Predicate { _ in false }
+		}
+	}
 }
 
 public struct CodeAnalyser {
 
 	public init () {}
 
-	private func subdirectoriesFromPath(_ path: String) -> IO<[String]> {
-		guard let paths = try? FileManager.default
-				.subpathsOfDirectory(atPath: path)
-				.filter(Predicate.supportedFiletypes.contains)
-		else { return IO { [] } }
+	private func supportedFiletypes(_ supportedFiletypes: Filetype) -> (String) -> IO<[String]> {
+		return { path in
+			guard let paths = try? FileManager.default
+					.subpathsOfDirectory(atPath: path)
+					.filter(Predicate.supportedFileTypes(from: supportedFiletypes).contains)
+			else { return IO { [] } }
 
-		return IO { paths }
+			return IO { paths }
+		}
 	}
 
 	private func sourceFile(for path: String) -> IO<String.SubSequence> {
@@ -140,15 +157,19 @@ extension CodeAnalyser {
 		.map(Fileinfo.init)
 	}
 
-	public func start(startPath: String) -> IO<[Fileinfo]> {
-		createStartPath(path: startPath)
+	public func start(startPath: String, fileType: Filetype = .all) -> IO<[Fileinfo]> {
+		let subdirectoriesFromPath = supportedFiletypes(fileType)
+		return createStartPath(path: startPath)
 			.flatMap(subdirectoriesFromPath)
 			.flatMap(analyzeSubpaths)
 	}
 
-	public func start(startPath: String) -> IO<([LanguageSummary], [Statistics])> {
-		self.start(startPath: startPath)
-			.flatMap(createLanguageSummary)
+	public func start(startPath: String, fileType: Filetype = .all) -> IO<([LanguageSummary], [Statistics])> {
+		self.start(
+			startPath: startPath,
+			fileType: fileType
+		)
+		.flatMap(createLanguageSummary)
 	}
 
 	// MARK: - Async versions
@@ -167,17 +188,22 @@ extension CodeAnalyser {
 		)
 	}
 	
-	public func startAsync(startPath: String) -> Deferred<([LanguageSummary], [Statistics])> {
+	public func startAsync(startPath: String, fileType: Filetype = .all) -> Deferred<([LanguageSummary], [Statistics])> {
 		deferred(
-			start(startPath: startPath)
-				.flatMap(createLanguageSummary)
+			start(
+				startPath: startPath,
+				fileType: fileType
+			)
+			.flatMap(createLanguageSummary)
 		)
 	}
 
-	public func startAsync(startPath: String) -> Deferred<[Fileinfo]> {
-		deferred(createStartPath(path: startPath)
-					.flatMap(subdirectoriesFromPath)
-					.flatMap(analyzeSubpaths)
+	public func startAsync(startPath: String, fileType: Filetype = .all) -> Deferred<[Fileinfo]> {
+		deferred(
+			start(
+				startPath: startPath,
+				fileType: fileType
+			)
 		)
 	}
 }
