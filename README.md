@@ -11,37 +11,26 @@ Internally both use ```IO<A>``` which is blocking the thread until its done, but
 
 ```IO<A>``` Is totally lazy, it wont execute anything until you call ```unsafeRun()``` on the other hand ```Deferred``` will start the analyses immediately but wont block the thread, but instead deliver its result by callback when its done. 
 
-All version that returns a ```Deferred``` has a **async**(...) postfix in the function signature. Ex:
+All version that returns a ```Deferred``` has a **Async**(...) postfix in the function signature. Ex:
 
+##### Deferred
 ```swift
-CodeAnalyser()
-	.startAsync(startPath: "../somepath")
+.startAsync(startPath: "../somepath") -> Deferred<[FileInfo]>
+.startAsync(startPath: "../somepath") -> Deferred<([LanguageSummary], [Statistics])>
+```
+
+##### IO
+```swift
+.start(startPath: "../somepath") -> IO<[FileInfo]>
+.start(startPath: "../somepath") -> IO<([LanguageSummary], [Statistics])>
 ```
 
 
 #### There are three ways of running analysis.
 - *Path* will run recusively. There is two overloads with different results:
 	- Statistics and summary for all files ```([LanguageSummary], [Statistics])```
-	- Alist of fileinfo for all files ```[FileInfo]```
+	- A list of fileinfo for all files ```[FileInfo]```
 - Analyse a single file ```FileInfo```
-
-
-#### Create
-
-```swift
-CodeAnalyser()
-	.start(startPath: "../somepath")
-```
-
-#### Create and Start Deferred
-Deferred will start the evaluation directly and return its result with a callback.
-
-```swift
-CodeAnalyser()
-	.startAsync(startPath: "../somepath") { (summary, statistics) in
-		print("summary:\(summary)\(statistics)") 
-}
-```
 
 
 #### Gettings the result with statistics and summary
@@ -62,7 +51,21 @@ let fileInfos: [FileInfo] = CodeAnalyser()
   .unsafeRun()
 ```
 
-#### FileInfo model
+#### Analysing a singlefile
+Synchronous:
+
+```swift
+func analyseSourcefile(_ filename: String, filedata: String, filetype: Filetype) ->IO<Fileinfo>
+```
+Asynchronous:
+
+```swift
+func analyseSourcefileAsync(_ filename: String, filedata: String, filetype: Filetype) ->Deferred<Fileinfo>
+```
+
+### Models
+
+#### FileInfo
 ```swift
 public struct Fileinfo {
   public let filename: String
@@ -78,20 +81,7 @@ public struct Fileinfo {
 }
 ```
 
-
-#### Analysing a singlefile
-Synchronous:
-
-```swift
-func analyseSourcefile(_ filename: String, filedata: String, filetype: Filetype) ->IO<Fileinfo>
-```
-Asynchronous:
-
-```swift
-func analyseSourcefileAsync(_ filename: String, filedata: String, filetype: Filetype) ->Deferred<Fileinfo>
-```
-
-#### Filetype Model
+#### Filetype
 An enum to show wich language (or all/none)
 
 ```swift
@@ -104,7 +94,7 @@ public enum Filetype {
 }
 ```
 
-#### Language Summary Model
+#### Language Summary
 Language Summary holds the information about every language. 
 Filetype will tell you which language it is.
 
@@ -123,7 +113,7 @@ public struct LanguageSummary {
 }
 ```
 
-#### Statistics Model
+#### Statistics
 Will return the percentage based on linecount.  Filetype will tell you which language it is.
 
 ```swift
