@@ -11,18 +11,25 @@ Internally both use ```IO<A>``` which is blocking the thread until its done, but
 
 ```IO<A>``` Is totally lazy, it wont execute anything until you call ```unsafeRun()``` on the other hand ```Deferred``` will start the analyses immediately but wont block the thread, but instead deliver its result by callback when its done. 
 
-All version that returns a ```Deferred``` has a **async**(...) postfix in the function signature. Ex:
+All version that returns a ```Deferred``` has a **Async**(...) postfix in the function signature. Ex:
 
+##### Deferred
 ```swift
-CodeAnalyser()
-	.startAsync(startPath: "../somepath")
+.startAsync(startPath: "../somepath") -> Deferred<[FileInfo]>
+.startAsync(startPath: "../somepath") -> Deferred<([LanguageSummary], [Statistics])>
+```
+
+##### IO
+```swift
+.start(startPath: "../somepath") -> IO<[FileInfo]>
+.start(startPath: "../somepath") -> IO<([LanguageSummary], [Statistics])>
 ```
 
 
 #### There are three ways of running analysis.
 - *Path* will run recusively. There is two overloads with different results:
 	- Statistics and summary for all files ```([LanguageSummary], [Statistics])```
-	- Alist of fileinfo for all files ```[FileInfo]```
+	- A list of fileinfo for all files ```[FileInfo]```
 - Analyse a single file ```FileInfo```
 
 
