@@ -150,4 +150,34 @@ extension CodeAnalyser {
 		self.start(startPath: startPath)
 			.flatMap(createLanguageSummary)
 	}
+
+	// MARK: - Async versions
+	public func analyseSourcefileAsync(
+		_ filename: String,
+		filedata: String.SubSequence,
+		filetype: Filetype
+	) -> Deferred<Fileinfo> {
+
+		deferred(
+			analyseSourcefile(
+				filename,
+				filedata: filedata,
+				filetype: filetype
+			)
+		)
+	}
+	
+	public func startAsync(startPath: String) -> Deferred<([LanguageSummary], [Statistics])> {
+		deferred(
+			start(startPath: startPath)
+				.flatMap(createLanguageSummary)
+		)
+	}
+
+	public func startAsync(startPath: String) -> Deferred<[Fileinfo]> {
+		deferred(createStartPath(path: startPath)
+					.flatMap(subdirectoriesFromPath)
+					.flatMap(analyzeSubpaths)
+		)
+	}
 }
