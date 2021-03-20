@@ -33,24 +33,6 @@ All version that returns a ```Deferred``` has a **Async**(...) postfix in the fu
 - Analyse a single file ```FileInfo```
 
 
-#### Create
-
-```swift
-CodeAnalyser()
-	.start(startPath: "../somepath")
-```
-
-#### Create and Start Deferred
-Deferred will start the evaluation directly and return its result with a callback.
-
-```swift
-CodeAnalyser()
-	.startAsync(startPath: "../somepath") { (summary, statistics) in
-		print("summary:\(summary)\(statistics)") 
-}
-```
-
-
 #### Gettings the result with statistics and summary
 
 ```swift
