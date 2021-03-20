@@ -31,6 +31,6 @@ extension Fileinfo {
 		imports: 0,
 		extensions: 0,
 		linecount: 0,
-		filetype: .none
+		filetype: .empty
 	)
 }

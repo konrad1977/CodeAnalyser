@@ -16,10 +16,12 @@ extension Filetype {
 			return "Swift"
 		case .objectiveC:
 			return "Objective-C"
-		case .none:
+		case .empty:
 			return ""
 		case .all:
 			return "Summary"
+		default:
+			return ""
 		}
 	}
 }

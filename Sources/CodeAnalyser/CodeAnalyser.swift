@@ -7,32 +7,6 @@
 
 import Foundation
 
-fileprivate extension Predicate where A == String {
-	static var allSupportedFileTypes = Predicate {
-		$0.hasSuffix(".swift") ||
-			$0.hasSuffix(".m") ||
-			$0.hasSuffix(".h") ||
-			$0.hasSuffix(".kt") ||
-			$0.hasSuffix(".ktm") ||
-			$0.hasSuffix(".kts")
-	}
-
-	static func supportedFileTypes(from fileType: Filetype) -> Predicate<String> {
-		switch fileType {
-		case .all:
-			return allSupportedFileTypes
-		case .kotlin:
-			return Predicate { $0.hasSuffix(".kt") || $0.hasSuffix(".ktm") || $0.hasSuffix(".kts") }
-		case .swift:
-			return Predicate { $0.hasSuffix(".swift") }
-		case .objectiveC:
-			return Predicate { $0.hasSuffix(".m") || $0.hasSuffix(".h") }
-		case .none:
-			return Predicate { _ in false }
-		}
-	}
-}
-
 public struct CodeAnalyser {
 
 	public init () {}
@@ -41,7 +15,13 @@ public struct CodeAnalyser {
 		return { path in
 			guard let paths = try? FileManager.default
 					.subpathsOfDirectory(atPath: path)
-					.filter(Predicate.supportedFileTypes(from: supportedFiletypes).contains)
+					.filter(
+						anyOf(
+							supportedFiletypes
+							.elements()
+							.map { $0.predicate }
+						).contains
+					)
 			else { return IO { [] } }
 
 			return IO { paths }

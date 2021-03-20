@@ -41,7 +41,7 @@ extension LanguageSummary {
 		extensions: 0,
 		linecount: 0,
 		filecount: 0,
-		filetype: .none
+		filetype: .empty
 	)
 }
 

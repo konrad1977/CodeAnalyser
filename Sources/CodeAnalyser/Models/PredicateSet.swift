@@ -7,6 +7,30 @@
 
 import Foundation
 
-struct Predicate<A> {
-	let contains: (A) -> Bool
+public struct Predicate<A> {
+	public let contains: (A) -> Bool
+}
+
+public func anyOf<A>(
+	_ predicate: Predicate<A>...
+) -> Predicate<A> {
+	Predicate { a in predicate.contains(where: { $0.contains(a) }) }
+}
+
+public func anyOf<A>(
+	_ predicate: [Predicate<A>]
+) -> Predicate<A> {
+	Predicate { a in predicate.contains(where: { $0.contains(a) }) }
+}
+
+public func allOf<A>(
+	_ predicate: Predicate<A>...
+) -> Predicate<A> {
+	Predicate { a in predicate.allSatisfy { $0.contains(a) } }
+}
+
+public func allOf<A>(
+	_ predicate: [Predicate<A>]
+) -> Predicate<A> {
+	Predicate { a in predicate.allSatisfy { $0.contains(a) } }
 }
