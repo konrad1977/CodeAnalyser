@@ -2,24 +2,38 @@
 
 A description of this package.
 
-#### How to use
+##### Known bugs
+- We analyse both .h / .m for Objective-c this will result in more functions than it actually is.
 
-###### Create and Start
+### How to use IO (Synchronous) and Deferred (Asynchronous)
+
+#### Create and Start IO
 
 ```swift
 CodeAnalyser()
 	.start(startPath: "../somepath")
 ```
 
-###### Lazy evaluation
-CodeAnalyser is completely lazy, its not until you run
+#### Lazy evaluation
+CodeAnalyser that returns IO<Type> is completely lazy, its not until you run
 ```swift
 .unsafeRun()
 ```
 will the code be evaluated. 
 	
 
-###### Gettings the result with statistics and summary
+#### Create and Start Deferred
+Deferred will start the evaluation directly and return its result with a callback.
+
+```swift
+CodeAnalyser()
+	.startAsync(startPath: "../somepath") { 
+	(summary, statistics) in print("summary:\()\()") 
+}
+```
+
+
+#### Gettings the result with statistics and summary
 
 ```swift
 let (languageSummary: [LanguageSummary], statistics: [Statistics]) = CodeAnalyser()
@@ -28,7 +42,7 @@ let (languageSummary: [LanguageSummary], statistics: [Statistics]) = CodeAnalyse
 ```
 
 
-###### Gettings the result as a fileinfo list
+#### Gettings the result as a fileinfo list
 Use this if you want to list all the files in a project and see statistics for each file
 ```swift
 let fileInfos: [FileInfo] = CodeAnalyser()
@@ -36,7 +50,7 @@ let fileInfos: [FileInfo] = CodeAnalyser()
   .unsafeRun()
 ```
 
-###### FileInfo model
+#### FileInfo model
 ```swift
 public struct Fileinfo {
   public let filename: String
@@ -53,7 +67,7 @@ public struct Fileinfo {
 ```
 
 
-###### Analysing a singlefile
+#### Analysing a singlefile
 
 ```swift
 func analyseSourcefile(_ filename: String, filedata: String, filetype: Filetype) ->IO<Fileinfo>
@@ -63,7 +77,7 @@ Usage:
 let fileInfo = analyseSourcefile("AppDelegate.swift", filedata: filedata, filetype: .swift).unsafeRun()
 ```
 
-###### Filetype Model
+#### Filetype Model
 An enum to show wich language (or all/none)
 ```swift
 public enum Filetype {
@@ -75,7 +89,7 @@ public enum Filetype {
 }
 ```
 
-###### Language Summary Model
+#### Language Summary Model
 Language Summary holds the information about every language. 
 Filetype will tell you which language it is.
 ```swift
@@ -93,7 +107,7 @@ public struct LanguageSummary {
 }
 ```
 
-###### Statistics Model
+#### Statistics Model
 Will return the percentage based on linecount.  Filetype will tell you which language it is.
 ```swift
 public struct Statistics {
@@ -101,3 +115,6 @@ public struct Statistics {
   public let lineCountPercentage: Double
 }
 ```
+
+#### Apps that uses CodeAnalyser
+- ProjectExplorer (pinfo) https://github.com/konrad1977/ProjectExplorer
