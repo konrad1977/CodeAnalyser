@@ -15,14 +15,14 @@ All version that returns a ```Deferred``` has a **Async**(...) postfix in the fu
 
 ##### Deferred
 ```swift
-.startAsync(startPath: "../somepath") -> Deferred<[FileInfo]>
-.startAsync(startPath: "../somepath") -> Deferred<([LanguageSummary], [Statistics])>
+.startAsync(startPath: "../somepath", language: [.swift, .kotlin]) -> Deferred<[FileInfo]>
+.startAsync(startPath: "../somepath", language: [.swift, .objectiveC]) -> Deferred<([LanguageSummary], [Statistics])>
 ```
 
 ##### IO
 ```swift
 .start(startPath: "../somepath") -> IO<[FileInfo]>
-.start(startPath: "../somepath") -> IO<([LanguageSummary], [Statistics])>
+.start(startPath: "../somepath", language: .swift) -> IO<([LanguageSummary], [Statistics])>
 ```
 
 
@@ -34,10 +34,11 @@ All version that returns a ```Deferred``` has a **Async**(...) postfix in the fu
 
 
 #### Gettings the result with statistics and summary
+Default language parameter is all, you can specify one or multiple languages you want to analyse. Whats happening under the hood is that all files with matching extension will be analysed. 
 
 ```swift
 let (languageSummary: [LanguageSummary], statistics: [Statistics]) = CodeAnalyser()
-  .start(startPath: "../somepath")
+  .start(startPath: "../somepath", language: .swift)
   .unsafeRun()
 ```
 
@@ -85,12 +86,20 @@ public struct Fileinfo {
 An enum to show wich language (or all/none)
 
 ```swift
-public enum Filetype {
-  case all
-  case kotlin
-  case swift
-  case objectiveC
-  case none
+public struct Filetype: OptionSet {
+
+  public let rawValue: Int
+
+  public static let swift = Filetype(rawValue: 1 << 0)
+  public static let kotlin = Filetype(rawValue: 1 << 1)
+  public static let objectiveC = Filetype(rawValue: 1 << 2)
+
+  public static let all: Filetype = [.swift, .kotlin, .objectiveC]
+  public static let empty: Filetype = []
+
+  public init (rawValue: Int) {
+    self.rawValue = rawValue
+  }
 }
 ```
 
