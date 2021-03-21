@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Funswift
+
 extension Filetype {
 	public var predicate: Predicate<String> {
 		switch self {

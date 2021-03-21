@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Funswift
 
 public struct CodeAnalyser {
 

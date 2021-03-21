@@ -9,11 +9,19 @@ let package = Package(
             targets: ["CodeAnalyser"]),
     ],
     dependencies: [
+		.package(
+			name: "Funswift",
+			url: "https://github.com/konrad1977/funswift.git",
+			.branch("main")
+		)
     ],
     targets: [
         .target(
             name: "CodeAnalyser",
-            dependencies: []),
+			dependencies: [
+				.product(name: "Funswift", package: "Funswift")
+			])
+		,
         .testTarget(
             name: "CodeAnalyserTests",
             dependencies: ["CodeAnalyser"]),

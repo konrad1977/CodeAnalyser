@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Funswift
 
 enum SourceFileAnalysis {
 
