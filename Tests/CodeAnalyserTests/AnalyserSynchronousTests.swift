@@ -1,10 +1,13 @@
 import XCTest
 @testable import CodeAnalyser
 
-final class CodeAnalyserTests: XCTestCase {
+final class CodeAnalyserSynchronousTests: XCTestCase {
 
     func testEmptyResult() {
-		let (langs, statistics) = CodeAnalyser().start(startPath: "/").unsafeRun()
+		let (langs, statistics) = CodeAnalyser()
+			.statistics(from: "/")
+			.unsafeRun()
+
 		XCTAssertEqual(langs.count, 4)
 		XCTAssertTrue(statistics.isEmpty, "Statistics not empty")
     }

@@ -137,16 +137,16 @@ extension CodeAnalyser {
 		.map(Fileinfo.init)
 	}
 
-	public func start(startPath: String, language: Filetype = .all) -> IO<[Fileinfo]> {
+	public func fileInfo(from startPath: String, language: Filetype = .all) -> IO<[Fileinfo]> {
 		let subdirectoriesFromPath = supportedFiletypes(language)
 		return createStartPath(path: startPath)
 			.flatMap(subdirectoriesFromPath)
 			.flatMap(analyzeSubpaths)
 	}
 
-	public func start(startPath: String, language: Filetype = .all) -> IO<([LanguageSummary], [Statistics])> {
-		self.start(
-			startPath: startPath,
+	public func statistics(from startPath: String, language: Filetype = .all) -> IO<([LanguageSummary], [Statistics])> {
+		self.fileInfo(
+			from: startPath,
 			language: language
 		)
 		.flatMap(createLanguageSummary)
@@ -168,20 +168,20 @@ extension CodeAnalyser {
 		)
 	}
 	
-	public func startAsync(startPath: String, language: Filetype = .all) -> Deferred<([LanguageSummary], [Statistics])> {
+	public func statisticsAsync(from startPath: String, language: Filetype = .all) -> Deferred<([LanguageSummary], [Statistics])> {
 		deferred(
-			start(
-				startPath: startPath,
+			fileInfo(
+				from: startPath,
 				language: language
 			)
 			.flatMap(createLanguageSummary)
 		)
 	}
 
-	public func startAsync(startPath: String, language: Filetype = .all) -> Deferred<[Fileinfo]> {
+	public func fileInfoAsync(from startPath: String, language: Filetype = .all) -> Deferred<[Fileinfo]> {
 		deferred(
-			start(
-				startPath: startPath,
+			fileInfo(
+				from: startPath,
 				language: language
 			)
 		)

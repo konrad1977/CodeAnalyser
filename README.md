@@ -15,14 +15,14 @@ All version that returns a ```Deferred``` has a **Async**(...) postfix in the fu
 
 ##### Deferred
 ```swift
-.startAsync(startPath: "../somepath", language: [.swift, .kotlin]) -> Deferred<[FileInfo]>
-.startAsync(startPath: "../somepath", language: [.swift, .objectiveC]) -> Deferred<([LanguageSummary], [Statistics])>
+.fileInfoAsync(from: "../somepath", language: [.swift, .kotlin]) -> Deferred<[FileInfo]>
+.statisticsAsync(from: "../somepath", language: [.swift, .objectiveC]) -> Deferred<([LanguageSummary], [Statistics])>
 ```
 
 ##### IO
 ```swift
-.start(startPath: "../somepath") -> IO<[FileInfo]>
-.start(startPath: "../somepath", language: .swift) -> IO<([LanguageSummary], [Statistics])>
+.fileInfo(from: "../somepath") -> IO<[FileInfo]>
+.statistics(from: "../somepath", language: .swift) -> IO<([LanguageSummary], [Statistics])>
 ```
 
 
@@ -38,7 +38,7 @@ Default language parameter is all, you can specify one or multiple languages you
 
 ```swift
 let (languageSummary: [LanguageSummary], statistics: [Statistics]) = CodeAnalyser()
-  .start(startPath: "../somepath", language: .swift)
+  .statistics(from: "../somepath", language: .swift)
   .unsafeRun()
 ```
 
@@ -48,7 +48,7 @@ Use this if you want to list all the files in a project and see statistics for e
 
 ```swift
 let fileInfos: [FileInfo] = CodeAnalyser()
-  .start(startPath: "../somepath")
+  .fileInfo(from: "../somepath")
   .unsafeRun()
 ```
 
