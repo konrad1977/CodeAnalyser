@@ -15,16 +15,31 @@ All version that returns a ```Deferred``` has a **Async**(...) postfix in the fu
 
 ##### Deferred
 ```swift
-.fileInfoAsync(from: "../somepath", language: [.swift, .kotlin]) -> Deferred<[FileInfo]>
-.statisticsAsync(from: "../somepath", language: [.swift, .objectiveC]) -> Deferred<([LanguageSummary], [Statistics])>
+CodeAnalyser().fileInfoAsync(from: "../somepath", language: [.swift, .kotlin]) -> Deferred<[FileInfo]>
+CodeAnalyser().statisticsAsync(from: "../somepath", language: [.swift, .objectiveC]) -> Deferred<([LanguageSummary], [Statistics])>
+```
+
+Getting value out of deferred:
+```swift
+CodeAnalyser()
+  .fileInfoAsync(from: "../somepath", language: [.swift, .kotlin])
+  .run { fileinfo in 
+    print(fileinfo)
+  }
 ```
 
 ##### IO
 ```swift
-.fileInfo(from: "../somepath") -> IO<[FileInfo]>
-.statistics(from: "../somepath", language: .swift) -> IO<([LanguageSummary], [Statistics])>
+CodeAnalyser().fileInfo(from: "../somepath") -> IO<[FileInfo]>
+CodeAnalyser().statistics(from: "../somepath", language: .swift) -> IO<([LanguageSummary], [Statistics])>
 ```
 
+##### Getting value out of IO
+```swift
+let fileinfo = CodeAnalyser()
+  .fileInfo(from: "../somepath", language: [.swift, .kotlin])
+  .unsafeRun()
+```
 
 #### There are three ways of running analysis.
 - *Path* will run recusively. There is two overloads with different results:
