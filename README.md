@@ -9,7 +9,7 @@ A description of this package.
 Its possible to analyse the code both synchronous ```IO<A>``` or asynchronous ```Deferred<A>```.
 Internally both use ```IO<A>``` which is blocking the thread until its done, but it can be started wrapped in a Deferred for a better experience with apps with GUI.
 
-```IO<A>``` Is totally lazy, it wont execute anything until you call ```unsafeRun()``` on the other hand ```Deferred``` will start the analyses immediately but wont block the thread, but instead deliver its result by callback when its done. 
+```IO<A>``` Is totally lazy, it wont execute anything until you call ```unsafeRun()``` and ```Deferred``` will start the analyses when you run it and the result will come as a callback. 
 
 All version that returns a ```Deferred``` has a **Async**(...) postfix in the function signature. Ex:
 
