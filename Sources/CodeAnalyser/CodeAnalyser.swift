@@ -17,13 +17,14 @@ public struct CodeAnalyser {
 extension CodeAnalyser {
 
     public func analyseSourcefile(
-        _ filename: String,
+        path: String,
+        filename: String,
         filedata: String.SubSequence,
         filetype: Filetype
     ) -> IO<Fileinfo> {
 
         zip(
-            IO.pure(String(filedata)),
+            IO.pure(path),
             IO.pure(filename),
             SourceFileAnalysis.countClasses(filetype: filetype)(filedata),
             SourceFileAnalysis.countStructs(filetype: filetype)(filedata),
@@ -54,16 +55,15 @@ extension CodeAnalyser {
 
     // MARK: - Async versions
     public func analyseSourcefileAsync(
-        _ filename: String,
+        path: String,
+        filename: String,
         filedata: String.SubSequence,
         filetype: Filetype
     ) -> Deferred<Fileinfo> {
 
         Deferred(io:
             analyseSourcefile(
-                filename,
-                filedata: filedata,
-                filetype: filetype
+                path: path, filename: filename, filedata: filedata, filetype: filetype
             )
         )
     }
@@ -116,7 +116,7 @@ extension CodeAnalyser {
     private func analyzeSourceFile(path: String, filename: String, filetype: Filetype) -> IO<Fileinfo> {
         sourceFile(for: path)
             .flatMap {
-                analyseSourcefile(filename, filedata: $0, filetype: filetype)
+                analyseSourcefile(path: path, filename: filename, filedata: $0, filetype: filetype)
             }
     }
 

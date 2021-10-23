@@ -15,7 +15,8 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 	func testAnalyserImportsSwift() {
 		let fileInfo = CodeAnalyser()
 			.analyseSourcefile(
-				"imports",
+                path: "/",
+                filename: "imports",
 				filedata: swiftImports[...],
 				filetype: .swift
 			)
@@ -25,7 +26,8 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 	func testAnalyserExtensionsSwift() {
 		let fileInfo = CodeAnalyser()
 			.analyseSourcefile(
-				"extensions",
+                path: "/",
+                filename: "extensions",
 				filedata: extensions[...],
 				filetype: .swift
 			)
@@ -35,7 +37,8 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 	func testAnalyserClassesSwift() {
 		let fileInfo = CodeAnalyser()
 			.analyseSourcefile(
-				"classes",
+                path: "/",
+                filename: "classes",
 				filedata: classes[...],
 				filetype: .swift
 			)
@@ -45,7 +48,8 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 	func testAnalyserFunctionsSwift() {
 		let fileInfo = CodeAnalyser()
 			.analyseSourcefile(
-				"functions",
+                path: "/",
+                filename: "functions",
 				filedata: functions[...],
 				filetype: .swift
 			)
@@ -55,7 +59,8 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 	func testAnalyserFullFileSwift() {
 		let fileInfo = CodeAnalyser()
 			.analyseSourcefile(
-				"fullfile",
+                path: "/",
+				filename: "fullfile",
 				filedata: fullFile[...],
 				filetype: .swift
 			)

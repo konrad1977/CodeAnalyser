@@ -24,7 +24,8 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 
 		CodeAnalyser()
 			.analyseSourcefileAsync(
-				"imports",
+                path: "/",
+				filename: "imports",
 				filedata: swiftImports[...],
 				filetype: .swift
 			).run { filinfo in
@@ -41,7 +42,8 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 
 		CodeAnalyser()
 			.analyseSourcefileAsync(
-				"extensions",
+                path: "/",
+				filename:"extensions",
 				filedata: extensions[...],
 				filetype: .swift
 			).run { fileinfo in
@@ -58,7 +60,8 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 
 		CodeAnalyser()
 			.analyseSourcefileAsync(
-				"classes",
+                path: "/",
+                filename: "classes",
 				filedata: classes[...],
 				filetype: .swift
 			).run { fileinfo in
@@ -74,7 +77,8 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 
 		CodeAnalyser()
 			.analyseSourcefileAsync(
-				"functions",
+                path: "/",
+				filename: "functions",
 				filedata: functions[...],
 				filetype: .swift
 			).run { fileinfo in
@@ -90,7 +94,8 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 
 		CodeAnalyser()
 			.analyseSourcefileAsync(
-				"fullfile",
+                path: "/",
+				filename: "fullfile",
 				filedata: fullFile[...],
 				filetype: .swift
 			).run { fileinfo in
