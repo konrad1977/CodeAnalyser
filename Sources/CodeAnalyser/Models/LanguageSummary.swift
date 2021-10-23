@@ -43,6 +43,9 @@ extension LanguageSummary {
 		filecount: 0,
 		filetype: .empty
 	)
+    func isEmpty() -> Bool {
+        linecount == 0
+    }
 }
 
 extension LanguageSummary {
