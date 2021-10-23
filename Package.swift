@@ -3,6 +3,10 @@ import PackageDescription
 
 let package = Package(
     name: "CodeAnalyser",
+    platforms: [
+        .iOS(.v9),
+        .macOS(.v10_11)
+    ],
     products: [
         .library(
             name: "CodeAnalyser",
