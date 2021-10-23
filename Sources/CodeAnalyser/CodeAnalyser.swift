@@ -23,7 +23,7 @@ extension CodeAnalyser {
     ) -> IO<Fileinfo> {
 
         zip(
-            IO(filename),
+            IO.pure(filename),
             SourceFileAnalysis.countClasses(filetype: filetype)(filedata),
             SourceFileAnalysis.countStructs(filetype: filetype)(filedata),
             SourceFileAnalysis.countEnums(filetype: filetype)(filedata),
@@ -32,7 +32,7 @@ extension CodeAnalyser {
             SourceFileAnalysis.countImports(filetype: filetype)(filedata),
             SourceFileAnalysis.countExtensions(filetype: filetype)(filedata),
             SourceFileAnalysis.countLinesIn(sourceFile: filedata),
-            IO(filetype)
+            IO.pure(filetype)
         )
         .map(Fileinfo.init)
     }
@@ -58,7 +58,7 @@ extension CodeAnalyser {
         filetype: Filetype
     ) -> Deferred<Fileinfo> {
 
-        deferred(
+        Deferred(io:
             analyseSourcefile(
                 filename,
                 filedata: filedata,
@@ -68,7 +68,7 @@ extension CodeAnalyser {
     }
 
     public func statisticsAsync(from startPath: String, language: Filetype = .all) -> Deferred<([LanguageSummary], [Statistics])> {
-        deferred(
+        Deferred(io:
             fileInfo(
                 from: startPath,
                 language: language
@@ -78,8 +78,7 @@ extension CodeAnalyser {
     }
 
     public func fileInfoAsync(from startPath: String, language: Filetype = .all) -> Deferred<[Fileinfo]> {
-        deferred(
-            fileInfo(
+        Deferred(io: fileInfo(
                 from: startPath,
                 language: language
             )
