@@ -8,6 +8,7 @@
 import Foundation
 
 public struct Fileinfo {
+    public let path: String
 	public let filename: String
 	public let classes: Int
 	public let structs: Int
@@ -22,6 +23,7 @@ public struct Fileinfo {
 
 extension Fileinfo {
 	static var empty = Fileinfo(
+        path: "",
 		filename: "",
 		classes: 0,
 		structs: 0,

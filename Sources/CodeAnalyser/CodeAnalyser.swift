@@ -23,6 +23,7 @@ extension CodeAnalyser {
     ) -> IO<Fileinfo> {
 
         zip(
+            IO.pure(String(filedata)),
             IO.pure(filename),
             SourceFileAnalysis.countClasses(filetype: filetype)(filedata),
             SourceFileAnalysis.countStructs(filetype: filetype)(filedata),
