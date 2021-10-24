@@ -8,6 +8,13 @@
 import Foundation
 import Funswift
 
+public struct SourceFile {
+    public let path: String
+    public let name: String
+    public let data: String.SubSequence
+    public let fileType: Filetype
+}
+
 public struct CodeAnalyser {
 	public init () {}
 }
@@ -15,46 +22,46 @@ public struct CodeAnalyser {
 // MARK: - Public synchrounous
 extension CodeAnalyser {
 
-    public func analyseLineCount(
-        path: String,
-        filename: String,
-        filedata: String.SubSequence,
-        filetype: Filetype
-    ) -> IO<FileLineInfo> {
+    public func fileInfo(
+        from startPath: String,
+        language: Filetype = .all
+    ) -> IO<[Fileinfo]> {
+        IO.pure(startPath)
+            .flatMap(supportedFiletypes(language) >=> analyzeCodeFileInSubpaths)
+    }
+
+    public func fileLineInfo(
+        from startPath: String,
+        language: Filetype = .all
+    ) -> IO<[FileLineInfo]> {
+        IO.pure(startPath)
+            .flatMap(supportedFiletypes(language) >=> analyzeLineCountInSubpaths)
+    }
+
+    public func analyseLineCount(sourceFile: SourceFile) -> IO<FileLineInfo> {
         zip(
-            IO.pure(path),
-            IO.pure(filename),
-            SourceFileAnalysis.countLinesIn(sourceFile: filedata),
-            IO.pure(filetype)
+            IO.pure(sourceFile.path),
+            IO.pure(sourceFile.name),
+            SourceFileAnalysis.countLinesIn(sourceFile: sourceFile.data),
+            IO.pure(sourceFile.fileType)
         ).map(FileLineInfo.init)
     }
 
-    public func analyseSourcefile(
-        path: String,
-        filename: String,
-        filedata: String.SubSequence,
-        filetype: Filetype
-    ) -> IO<Fileinfo> {
-
+    public func analyseSourcefile(sourceFile: SourceFile) -> IO<Fileinfo> {
         zip(
-            IO.pure(path),
-            IO.pure(filename),
-            SourceFileAnalysis.countClasses(filetype: filetype)(filedata),
-            SourceFileAnalysis.countStructs(filetype: filetype)(filedata),
-            SourceFileAnalysis.countEnums(filetype: filetype)(filedata),
-            SourceFileAnalysis.countInterfaces(filetype: filetype)(filedata),
-            SourceFileAnalysis.countFunctions(filetype: filetype)(filedata),
-            SourceFileAnalysis.countImports(filetype: filetype)(filedata),
-            SourceFileAnalysis.countExtensions(filetype: filetype)(filedata),
-            SourceFileAnalysis.countLinesIn(sourceFile: filedata),
-            IO.pure(filetype)
+            IO.pure(sourceFile.path),
+            IO.pure(sourceFile.name),
+            SourceFileAnalysis.countClasses(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countStructs(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countEnums(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countInterfaces(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countFunctions(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countImports(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countExtensions(filetype: sourceFile.fileType)(sourceFile.data),
+            SourceFileAnalysis.countLinesIn(sourceFile: sourceFile.data),
+            IO.pure(sourceFile.fileType)
         )
         .map(Fileinfo.init)
-    }
-
-    public func fileInfo(from startPath: String, language: Filetype = .all) -> IO<[Fileinfo]> {
-        return createStartPath(path: startPath)
-            .flatMap(supportedFiletypes(language) >=> analyzeSubpaths)
     }
 
     public func statistics(
@@ -72,35 +79,15 @@ extension CodeAnalyser {
 // MARK: - Async versions
 extension CodeAnalyser {
 
-    public func analyseLineCountAsync(
-        path: String,
-        filename: String,
-        filedata: String.SubSequence,
-        filetype: Filetype
-    ) -> Deferred<FileLineInfo> {
+    public func analyseLineCountAsync(sourceFile: SourceFile) -> Deferred<FileLineInfo> {
         Deferred(io:
-            analyseLineCount(
-                path: path,
-                filename: filename,
-                filedata: filedata,
-                filetype: filetype
-            )
+            analyseLineCount(sourceFile: sourceFile)
         )
     }
 
-    public func analyseSourcefileAsync(
-        path: String,
-        filename: String,
-        filedata: String.SubSequence,
-        filetype: Filetype
-    ) -> Deferred<Fileinfo> {
+    public func analyseSourcefileAsync(sourceFile: SourceFile) -> Deferred<Fileinfo> {
         Deferred(io:
-            analyseSourcefile(
-                path: path,
-                filename: filename,
-                filedata: filedata,
-                filetype: filetype
-            )
+            analyseSourcefile(sourceFile: sourceFile)
         )
     }
 
@@ -145,36 +132,33 @@ extension CodeAnalyser {
         }
     }
 
-    private func sourceFile(for path: String) -> IO<String.SubSequence> {
+    private func fileData(from path: String) -> IO<String.SubSequence> {
         guard let file = try? String(contentsOfFile: path, encoding: .ascii)[...]
         else { return IO { "" } }
 
         return IO { file }
     }
 
-    private func analyzeSourceFile(path: String, filename: String, filetype: Filetype) -> IO<Fileinfo> {
-        sourceFile(for: path)
-            .flatMap {
-                analyseSourcefile(
-					path: path,
-					filename: filename,
-					filedata: $0,
-					filetype: filetype
-				)
-            }
+    private func createFileInfo(_ path: String) -> IO<SourceFile> {
+        fileData(from: path).map { data in
+            let fileUrl = URL(fileURLWithPath: path)
+            let filetype = Filetype(extension: fileUrl.pathExtension)
+            let filename = fileUrl.lastPathComponent
+            return SourceFile(path: fileUrl.relativePath, name: filename,  data: data, fileType: filetype)
+        }
     }
 
-    private func createFileInfo(_ path: String) -> IO<Fileinfo> {
-        let fileUrl = URL(fileURLWithPath: path)
-        let filetype = Filetype(extension: fileUrl.pathExtension)
-        let filename = fileUrl.lastPathComponent
-		return analyzeSourceFile(path: fileUrl.relativeString, filename: filename, filetype: filetype)
-    }
-
-    private func analyzeSubpaths(_ paths: [String]) -> IO<[Fileinfo]> {
+    private func analyzeCodeFileInSubpaths(_ paths: [String]) -> IO<[Fileinfo]> {
         IO { paths
-            .map(createFileInfo)
+            .map(createFileInfo >=> analyseSourcefile(sourceFile:))
             .map { $0.unsafeRun() }
+        }
+    }
+
+    private func analyzeLineCountInSubpaths(_ paths: [String]) -> IO<[FileLineInfo]> {
+        IO { paths
+                .map(createFileInfo >=> analyseLineCount(sourceFile:))
+                .map { $0.unsafeRun() }
         }
     }
 
@@ -229,10 +213,6 @@ extension CodeAnalyser {
 
     private func filterered(_ info: [Fileinfo]) -> (Filetype) -> IO<[Fileinfo]> {
         return { filetype in IO { info.filter { $0.filetype == filetype } } }
-    }
-
-    private func createStartPath(path: String) -> IO<String> {
-        return IO { path }
     }
 }
 

@@ -21,14 +21,15 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 	func testAnalyserImportsSwiftAsync() {
 
 		let expectation = XCTestExpectation(description: "Imports")
-
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "imports",
+            data: swiftImports[...],
+            fileType: .swift
+        )
 		CodeAnalyser()
-			.analyseSourcefileAsync(
-                path: "/",
-				filename: "imports",
-				filedata: swiftImports[...],
-				filetype: .swift
-			).run { filinfo in
+			.analyseSourcefileAsync(sourceFile: sourceFile)
+            .run { filinfo in
 				XCTAssertEqual(filinfo.imports, 2)
 				expectation.fulfill()
 			}
@@ -37,16 +38,17 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 	}
 
 	func testAnalyserExtensionsSwiftAsync() {
-
 		let expectation = XCTestExpectation(description: "Extensions")
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "extensions",
+            data:  extensions[...],
+            fileType: .swift
+        )
 
 		CodeAnalyser()
-			.analyseSourcefileAsync(
-                path: "/",
-				filename:"extensions",
-				filedata: extensions[...],
-				filetype: .swift
-			).run { fileinfo in
+			.analyseSourcefileAsync(sourceFile: sourceFile)
+            .run { fileinfo in
 				XCTAssertEqual(fileinfo.extensions, 3)
 				expectation.fulfill()
 
@@ -57,14 +59,16 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 	func testAnalyserClassesSwiftAsync() {
 
 		let expectation = XCTestExpectation(description: "Classes")
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "classes",
+            data:  classes[...],
+            fileType: .swift
+        )
 
 		CodeAnalyser()
-			.analyseSourcefileAsync(
-                path: "/",
-                filename: "classes",
-				filedata: classes[...],
-				filetype: .swift
-			).run { fileinfo in
+			.analyseSourcefileAsync(sourceFile: sourceFile)
+            .run { fileinfo in
 				XCTAssertEqual(fileinfo.classes, 2)
 				expectation.fulfill()
 			}
@@ -74,14 +78,16 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 	func testAnalyserFunctionsSwiftAsync() {
 
 		let expectation = XCTestExpectation(description: "Functions")
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "functions",
+            data:  functions[...],
+            fileType: .swift
+        )
 
 		CodeAnalyser()
-			.analyseSourcefileAsync(
-                path: "/",
-				filename: "functions",
-				filedata: functions[...],
-				filetype: .swift
-			).run { fileinfo in
+			.analyseSourcefileAsync(sourceFile: sourceFile)
+            .run { fileinfo in
 				XCTAssertEqual(fileinfo.functions, 3)
 				expectation.fulfill()
 			}
@@ -91,14 +97,15 @@ final class CodeAnalyserAsynchronousTests: XCTestCase {
 	func testAnalyserFullFileSwiftAsync() {
 
 		let expectation = XCTestExpectation(description: "Functions")
-
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "fullfile",
+            data: fullFile[...],
+            fileType: .swift
+        )
 		CodeAnalyser()
-			.analyseSourcefileAsync(
-                path: "/",
-				filename: "fullfile",
-				filedata: fullFile[...],
-				filetype: .swift
-			).run { fileinfo in
+			.analyseSourcefileAsync(sourceFile: sourceFile)
+            .run { fileinfo in
 				XCTAssertEqual(fileinfo.imports, 1)
 				XCTAssertEqual(fileinfo.classes, 0)
 				XCTAssertEqual(fileinfo.structs, 1)

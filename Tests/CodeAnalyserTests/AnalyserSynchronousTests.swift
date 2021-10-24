@@ -8,62 +8,67 @@ final class CodeAnalyserSynchronousTests: XCTestCase {
 			.statistics(from: "/")
 			.unsafeRun()
 
-		XCTAssertEqual(langs.count, 4)
+		XCTAssertEqual(langs.count, 0)
 		XCTAssertTrue(statistics.isEmpty, "Statistics not empty")
     }
 
 	func testAnalyserImportsSwift() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "imports",
+            data: swiftImports[...],
+            fileType: .swift
+        )
 		let fileInfo = CodeAnalyser()
-			.analyseSourcefile(
-                path: "/",
-                filename: "imports",
-				filedata: swiftImports[...],
-				filetype: .swift
-			)
+			.analyseSourcefile(sourceFile: sourceFile)
 		XCTAssertEqual(fileInfo.unsafeRun().imports, 2)
 	}
 
 	func testAnalyserExtensionsSwift() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "extensions",
+            data: extensions[...],
+            fileType: .swift
+        )
 		let fileInfo = CodeAnalyser()
-			.analyseSourcefile(
-                path: "/",
-                filename: "extensions",
-				filedata: extensions[...],
-				filetype: .swift
-			)
+			.analyseSourcefile(sourceFile: sourceFile)
 		XCTAssertEqual(fileInfo.unsafeRun().extensions, 3)
 	}
 
 	func testAnalyserClassesSwift() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "classes",
+            data: classes[...],
+            fileType: .swift
+        )
 		let fileInfo = CodeAnalyser()
-			.analyseSourcefile(
-                path: "/",
-                filename: "classes",
-				filedata: classes[...],
-				filetype: .swift
-			)
+			.analyseSourcefile(sourceFile: sourceFile)
 		XCTAssertEqual(fileInfo.unsafeRun().classes, 2)
 	}
 
 	func testAnalyserFunctionsSwift() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "functions",
+            data: functions[...],
+            fileType: .swift
+        )
 		let fileInfo = CodeAnalyser()
-			.analyseSourcefile(
-                path: "/",
-                filename: "functions",
-				filedata: functions[...],
-				filetype: .swift
-			)
+			.analyseSourcefile(sourceFile: sourceFile)
 		XCTAssertEqual(fileInfo.unsafeRun().functions, 3)
 	}
 
 	func testAnalyserFullFileSwift() {
-		let fileInfo = CodeAnalyser()
-			.analyseSourcefile(
-                path: "/",
-				filename: "fullfile",
-				filedata: fullFile[...],
-				filetype: .swift
-			)
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "fullfile",
+            data: fullFile[...],
+            fileType: .swift
+        )
+
+		let fileInfo = CodeAnalyser().analyseSourcefile(sourceFile: sourceFile)
 		XCTAssertEqual(fileInfo.unsafeRun().imports, 1)
 		XCTAssertEqual(fileInfo.unsafeRun().classes, 0)
 		XCTAssertEqual(fileInfo.unsafeRun().structs, 1)
