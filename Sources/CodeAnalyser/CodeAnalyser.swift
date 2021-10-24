@@ -129,7 +129,7 @@ extension CodeAnalyser {
         let fileUrl = URL(fileURLWithPath: path)
         let filetype = Filetype(extension: fileUrl.pathExtension)
         let filename = fileUrl.lastPathComponent
-		return analyzeSourceFile(path: fileUrl.absoluteString, filename: filename, filetype: filetype)
+		return analyzeSourceFile(path: fileUrl.relativeString, filename: filename, filetype: filetype)
     }
 
     private func analyzeSubpaths(_ paths: [String]) -> IO<[Fileinfo]> {
