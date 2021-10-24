@@ -9,12 +9,25 @@ import Foundation
 import Funswift
 
 public struct CodeAnalyser {
-
 	public init () {}
 }
 
-// MARK: - Public
+// MARK: - Public synchrounous
 extension CodeAnalyser {
+
+    public func analyseLineCount(
+        path: String,
+        filename: String,
+        filedata: String.SubSequence,
+        filetype: Filetype
+    ) -> IO<FileLineInfo> {
+        zip(
+            IO.pure(path),
+            IO.pure(filename),
+            SourceFileAnalysis.countLinesIn(sourceFile: filedata),
+            IO.pure(filetype)
+        ).map(FileLineInfo.init)
+    }
 
     public func analyseSourcefile(
         path: String,
@@ -41,34 +54,60 @@ extension CodeAnalyser {
 
     public func fileInfo(from startPath: String, language: Filetype = .all) -> IO<[Fileinfo]> {
         return createStartPath(path: startPath)
-            .flatMap(supportedFiletypes(language))
-            .flatMap(analyzeSubpaths)
+            .flatMap(supportedFiletypes(language) >=> analyzeSubpaths)
     }
 
-    public func statistics(from startPath: String, language: Filetype = .all) -> IO<([LanguageSummary], [Statistics])> {
+    public func statistics(
+        from startPath: String,
+        language: Filetype = .all
+    ) -> IO<([LanguageSummary], [Statistics])> {
         fileInfo(
             from: startPath,
             language: language
         )
         .flatMap(createLanguageSummary)
     }
+}
 
-    // MARK: - Async versions
+// MARK: - Async versions
+extension CodeAnalyser {
+
+    public func analyseLineCountAsync(
+        path: String,
+        filename: String,
+        filedata: String.SubSequence,
+        filetype: Filetype
+    ) -> Deferred<FileLineInfo> {
+        Deferred(io:
+            analyseLineCount(
+                path: path,
+                filename: filename,
+                filedata: filedata,
+                filetype: filetype
+            )
+        )
+    }
+
     public func analyseSourcefileAsync(
         path: String,
         filename: String,
         filedata: String.SubSequence,
         filetype: Filetype
     ) -> Deferred<Fileinfo> {
-
         Deferred(io:
             analyseSourcefile(
-                path: path, filename: filename, filedata: filedata, filetype: filetype
+                path: path,
+                filename: filename,
+                filedata: filedata,
+                filetype: filetype
             )
         )
     }
 
-    public func statisticsAsync(from startPath: String, language: Filetype = .all) -> Deferred<([LanguageSummary], [Statistics])> {
+    public func statisticsAsync(
+        from startPath: String,
+        language: Filetype = .all
+    ) -> Deferred<([LanguageSummary], [Statistics])> {
         Deferred(io:
             fileInfo(
                 from: startPath,
@@ -78,8 +117,12 @@ extension CodeAnalyser {
         )
     }
 
-    public func fileInfoAsync(from startPath: String, language: Filetype = .all) -> Deferred<[Fileinfo]> {
-        Deferred(io: fileInfo(
+    public func fileInfoAsync(
+        from startPath: String,
+        language: Filetype = .all
+    ) -> Deferred<[Fileinfo]> {
+        Deferred(io:
+            fileInfo(
                 from: startPath,
                 language: language
             )
@@ -94,11 +137,7 @@ extension CodeAnalyser {
             guard let paths = try? FileManager.default
                     .subpathsOfDirectory(atPath: path)
                     .filter(
-                        anyOf(
-                            supportedFiletypes
-                                .elements()
-                                .map { $0.predicate }
-                        ).contains
+                        anyOf(supportedFiletypes.elements().map { $0.predicate }).contains
                     )
             else { return IO { [] } }
 
