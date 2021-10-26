@@ -68,11 +68,13 @@ extension CodeAnalyser {
 
     public func statistics(
         from startPath: String,
-        language: Filetype = .all
+        language: Filetype = .all,
+        filter: PathFilter = .empty
     ) -> IO<([LanguageSummary], [Statistics])> {
         fileInfo(
             from: startPath,
-            language: language
+            language: language,
+            filter: filter
         )
         .flatMap(createLanguageSummary)
     }
