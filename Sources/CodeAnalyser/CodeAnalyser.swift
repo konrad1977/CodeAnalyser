@@ -24,18 +24,20 @@ extension CodeAnalyser {
 
     public func fileInfo(
         from startPath: String,
-        language: Filetype = .all
+        language: Filetype = .all,
+        filter: PathFilter = .empty
     ) -> IO<[Fileinfo]> {
         IO.pure(startPath)
-            .flatMap(supportedFiletypes(language) >=> analyzeCodeFileInSubpaths)
+            .flatMap(supportedFiletypes(language, filter: filter) >=> analyzeCodeFileInSubpaths)
     }
 
     public func fileLineInfo(
         from startPath: String,
-        language: Filetype = .all
+        language: Filetype = .all,
+        filter: PathFilter = .empty
     ) -> IO<[FileLineInfo]> {
         IO.pure(startPath)
-            .flatMap(supportedFiletypes(language) >=> analyzeLineCountInSubpaths)
+            .flatMap(supportedFiletypes(language, filter: filter) >=> analyzeLineCountInSubpaths)
     }
 
     public func analyseLineCount(sourceFile: SourceFile) -> IO<FileLineInfo> {
@@ -119,13 +121,12 @@ extension CodeAnalyser {
 
 // MARK: - Private
 extension CodeAnalyser {
-    private func supportedFiletypes(_ supportedFiletypes: Filetype) -> (String) -> IO<[String]> {
+    private func supportedFiletypes(_ supportedFiletypes: Filetype, filter: PathFilter) -> (String) -> IO<[String]> {
         return { path in
             guard let paths = try? FileManager.default
                     .subpathsOfDirectory(atPath: path)
-                    .filter(
-                        anyOf(supportedFiletypes.elements().map { $0.predicate }).contains
-                    )
+                    .filter(noneOf(filter.query).contains)
+                    .filter(anyOf(supportedFiletypes.elements().map { $0.predicate }).contains)
             else { return IO { [] } }
 
             return IO { paths }

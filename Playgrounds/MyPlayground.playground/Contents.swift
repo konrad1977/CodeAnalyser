@@ -1,6 +1,10 @@
 import UIKit
 import CodeAnalyser
 import Funswift
+import PlaygroundSupport
+
+PlaygroundPage.current.needsIndefiniteExecution = true
+
 
 //let fileType: Filetype = [.kotlin, .swift]
 //
@@ -11,3 +15,8 @@ import Funswift
 //).contains("file.m")
 
 
+let path = "/Users/mikaelkonradsson/Library/Developer/Xcode/DerivedData/Projectexplorer-cakkqemthjvphwcsibwdpzneciad/Build/Products/Debug/"
+
+CodeAnalyser()
+    .fileLineInfo(from: path, language: .swift, filter: .pods)
+    .unsafeRun()
