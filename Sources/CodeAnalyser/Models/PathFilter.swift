@@ -19,7 +19,7 @@ extension PathFilter {
             var predicate = Predicate<String> { _ in false }
             filter.forEach { filter in
                 predicate = predicate.union(
-                    other: Predicate<String> { $0.contains(filter) }
+                    other: Predicate<String> { $0.lowercased().contains(filter.lowercased()) }
                 )
             }
             return predicate
