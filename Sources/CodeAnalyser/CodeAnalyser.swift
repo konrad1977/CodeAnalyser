@@ -40,6 +40,25 @@ extension CodeAnalyser {
             .flatMap(supportedFiletypes(language, filter: filter) >=> analyzeLineCountInSubpaths)
     }
 
+    public func todos(
+        from startPath: String,
+        language: Filetype = .all,
+        filter: PathFilter = .empty
+    ) -> IO<[Todo]> {
+        IO.pure(startPath)
+            .flatMap(supportedFiletypes(language, filter: filter) >=> analyzeTodosInSubpaths)
+    }
+
+    public func analysTodo(in sourceFile: SourceFile) -> IO<Todo> {
+        zip(
+            IO.pure(sourceFile.path),
+            IO.pure(sourceFile.name),
+            TodoParser.todosCommentsIn(sourceFile: sourceFile.data),
+            IO.pure(sourceFile.fileType)
+            
+        ).map(Todo.init)
+    }
+
     public func analyseLineCount(sourceFile: SourceFile) -> IO<FileLineInfo> {
         zip(
             IO.pure(sourceFile.path),
@@ -161,6 +180,13 @@ extension CodeAnalyser {
     private func analyzeLineCountInSubpaths(_ paths: [String]) -> IO<[FileLineInfo]> {
         IO { paths
                 .map(createFileInfo >=> analyseLineCount(sourceFile:))
+                .map { $0.unsafeRun() }
+        }
+    }
+
+    private func analyzeTodosInSubpaths(_ paths: [String]) -> IO<[Todo]> {
+        IO { paths
+                .map(createFileInfo >=> analysTodo)
                 .map { $0.unsafeRun() }
         }
     }
