@@ -13,9 +13,10 @@ extension String.SubSequence {
 }
 
 struct TodoParser {
+
     static func todosCommentsIn(sourceFile: String.SubSequence) -> IO<[Comment]> {
         IO {
-            guard sourceFile.range(of: "TODO:") != nil
+            guard sourceFile.range(of: "TODO:") != nil || sourceFile.range(of: "FIXME:") != nil
             else { return [] }
 
             let lines = sourceFile.components(separatedBy: .newlines)
@@ -31,7 +32,7 @@ struct TodoParser {
 
     private static func parseLine(index: Int, source: String.SubSequence) -> Comment? {
         let (tmpString, todoIndex) = source.stringInfoBefore(":")
-        let isTodo = tmpString.contains("TODO")
+        let isTodo = tmpString.contains("TODO") || tmpString.contains("FIXME")
         guard isTodo == true
         else { return nil }
 
