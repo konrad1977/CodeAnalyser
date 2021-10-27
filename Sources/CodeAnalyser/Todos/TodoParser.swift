@@ -20,6 +20,10 @@ struct TodoParser {
             else { return [] }
 
             let lines = sourceFile.components(separatedBy: .newlines)
+
+            guard lines.isEmpty == false
+            else { return [] }
+
             var comments: [Comment] = []
             for (index, currentLine) in lines.enumerated() {
                 if let comment = TodoParser.parseLine(index: index, source: currentLine[...]) {
@@ -41,7 +45,7 @@ struct TodoParser {
 
         let message = String(source)
             .dropFirst(restIndex)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: .whitespaces)
         return Comment(line: index + 1, comment: message)
     }
 }
