@@ -21,9 +21,6 @@ struct TodoParser {
 
             let lines = sourceFile.components(separatedBy: .newlines)
 
-            guard lines.isEmpty == false
-            else { return [] }
-
             var comments: [Comment] = []
             for (index, currentLine) in lines.enumerated() {
                 if let comment = TodoParser.parseLine(index: index, source: currentLine[...]) {
@@ -36,9 +33,6 @@ struct TodoParser {
 
     private static func parseLine(index: Int, source: String.SubSequence) -> Comment? {
         let (tmpString, todoIndex) = source.stringInfoBefore(":")
-        let isTodo = tmpString.contains("TODO") || tmpString.contains("FIXME")
-        guard isTodo == true
-        else { return nil }
 
         guard let restIndex = todoIndex
         else { return nil }
