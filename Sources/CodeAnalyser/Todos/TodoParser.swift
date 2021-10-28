@@ -46,6 +46,9 @@ struct TodoParser {
         let message = String(source)
             .dropFirst(restIndex)
             .trimmingCharacters(in: .whitespaces)
-        return Comment(line: index + 1, comment: message)
+
+        return message.isEmpty || message.count < 3
+        ? nil
+        : Comment(line: index + 1, comment: message)
     }
 }
