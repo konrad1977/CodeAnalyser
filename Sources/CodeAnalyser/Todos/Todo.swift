@@ -1,8 +1,8 @@
 import Foundation
 
 public struct Comment {
-    let line: Int
-    let comment: String
+    public let line: Int
+    public let comment: String
 }
 
 public struct Todo {
