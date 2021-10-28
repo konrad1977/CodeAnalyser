@@ -20,22 +20,18 @@ final class TodoAnalyserTests: XCTestCase {
         XCTAssertEqual(todos.comments[2].comment, "Hello three")
     }
 
-//    func testSearchString() {
-//        let str = commentTodo[...]
-//
-//        let (tmpString, index) = str.stringInfoBefore(":")
-//        let isTodo = tmpString.contains("TODO")
-//
-//        XCTAssertTrue(isTodo)
-//
-//        if let restIndex = index {
-//            if let newLineIndex = str.range(of: "\n") {
-//                let message = String(str)
-//                    .substring(to: newLineIndex.lowerBound)
-//                    .dropFirst(restIndex)
-//                    .trimmingCharacters(in: .whitespacesAndNewlines)
-//                XCTAssertEqual(message, "Hello world")
-//            }
-//        }
-//    }
+    func testParseWarnings() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "warnings",
+            data: warningsTodo[...],
+            fileType: .swift
+        )
+
+        let todos = CodeAnalyser()
+            .analysTodo(in: sourceFile)
+            .unsafeRun()
+
+        XCTAssertEqual(todos.comments[0].comment, "Something is totally wrong")
+    }
 }

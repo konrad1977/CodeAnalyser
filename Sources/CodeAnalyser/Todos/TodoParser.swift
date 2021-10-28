@@ -16,25 +16,51 @@ struct TodoParser {
 
     static func todosCommentsIn(sourceFile: String.SubSequence) -> IO<[Comment]> {
         IO {
-            guard sourceFile.range(of: "TODO:") != nil || sourceFile.range(of: "FIXME:") != nil
+            guard sourceFile.range(of: "TODO:") != nil
+                    || sourceFile.range(of: "FIXME:") != nil
+                    || sourceFile.range(of: "#warning(") != nil
             else { return [] }
 
             let lines = sourceFile.components(separatedBy: .newlines)
 
             var comments: [Comment] = []
             for (index, currentLine) in lines.enumerated() {
-                guard currentLine.contains("TODO:") || currentLine.contains("FIXME:")
-                else { continue }
-
-                if let comment = TodoParser.parseLine(index: index, source: currentLine[...]) {
-                    comments.append(comment)
+                if isTodo(source: currentLine[...]) {
+                    TodoParser.parseTodo(index: index, source: currentLine[...])
+                        .flatMap { comments.append($0) }
+                }
+                if isWarning(source: currentLine[...]) {
+                    TodoParser.parseWarning(index: index, source: currentLine[...])
+                        .flatMap { comments.append($0) }
                 }
             }
             return comments
         }
     }
 
-    private static func parseLine(index: Int, source: String.SubSequence) -> Comment? {
+    private static func isTodo(source: String.SubSequence) -> Bool {
+        return source.contains("TODO:") || source.contains("FIXME:")
+    }
+
+    private static func isWarning(source: String.SubSequence) -> Bool {
+        source
+            .trimmingCharacters(in: .whitespaces)
+            .hasPrefix("#warning")
+    }
+
+    private static func parseWarning(index: Int, source: String.SubSequence) -> Comment? {
+        guard let todoIndex = source.lastIndex(of: "(")
+        else { return nil }
+        
+        let message = String(source[todoIndex ... source.index(before: source.endIndex)])
+            .dropFirst(2)
+            .dropLast(2)
+            .trimmingCharacters(in: .whitespaces)
+
+        return message.isEmpty ? nil : Comment(line: index + 1, comment: message)
+    }
+
+    private static func parseTodo(index: Int, source: String.SubSequence) -> Comment? {
         let (tmpString, todoIndex) = source.stringInfoBefore(":")
 
         guard (tmpString.contains("TODO") || tmpString.contains("FIXME")) == true, let restIndex = todoIndex

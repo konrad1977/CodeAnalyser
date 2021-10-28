@@ -8,3 +8,7 @@ let commentTodo = """
 // TODO: Hello three
 """
 
+let warningsTodo = """
+#warning("Something is totally wrong")
+// #warning("Something is totally wrong")
+"""
