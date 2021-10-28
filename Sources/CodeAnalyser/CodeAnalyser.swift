@@ -171,23 +171,17 @@ extension CodeAnalyser {
     }
 
     private func analyzeCodeFileInSubpaths(_ paths: [String]) -> IO<[Fileinfo]> {
-        IO { paths
-            .map(createFileInfo >=> analyseSourcefile(sourceFile:))
-            .map { $0.unsafeRun() }
-        }
+        IO { paths.map(createFileInfo >=> analyseSourcefile(sourceFile:) >>> CodeAnalyser.run) }
     }
 
     private func analyzeLineCountInSubpaths(_ paths: [String]) -> IO<[FileLineInfo]> {
-        IO { paths
-                .map(createFileInfo >=> analyseLineCount(sourceFile:))
-                .map { $0.unsafeRun() }
-        }
+        IO { paths.map(createFileInfo >=> analyseLineCount(sourceFile:) >>> CodeAnalyser.run) }
     }
 
     private func analyzeTodosInSubpaths(_ paths: [String]) -> IO<[Todo]> {
         IO { paths
-                .map(createFileInfo >=> analysTodo)
-                .map { $0.unsafeRun() }
+                .map(createFileInfo >=> analysTodo >>> CodeAnalyser.run)
+                .filter { $0.comments.count > 0 }
         }
     }
 
@@ -242,6 +236,10 @@ extension CodeAnalyser {
 
     private func filterered(_ info: [Fileinfo]) -> (Filetype) -> IO<[Fileinfo]> {
         return { filetype in IO { info.filter { $0.filetype == filetype } } }
+    }
+
+    private static func run<T>(io: IO<T>) -> T {
+        io.unsafeRun()
     }
 }
 
