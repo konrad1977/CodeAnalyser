@@ -39,7 +39,10 @@ struct TodoParser {
     }
 
     private static func isTodo(source: String.SubSequence) -> Bool {
-        return source.contains("TODO:") || source.contains("FIXME:")
+        let trimmed = source
+            .components(separatedBy: .whitespaces)
+            .joined()
+        return String(trimmed).hasPrefix("//TODO:") || String(trimmed).hasPrefix("//FIXME:")
     }
 
     private static func isWarning(source: String.SubSequence) -> Bool {
@@ -70,8 +73,6 @@ struct TodoParser {
             .dropFirst(restIndex)
             .trimmingCharacters(in: .whitespaces)
 
-        return message.isEmpty || message.count < 3
-        ? nil
-        : Comment(line: index + 1, comment: message)
+        return message.isEmpty || message.count < 3 ? nil : Comment(line: index + 1, comment: message)
     }
 }

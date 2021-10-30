@@ -20,6 +20,21 @@ final class TodoAnalyserTests: XCTestCase {
         XCTAssertEqual(todos.comments[2].comment, "Hello three")
     }
 
+    func testFalsePositives() {
+        let sourceFile = SourceFile(
+            path: "/mocked",
+            name: "falsepositives",
+            data: falsePositives[...],
+            fileType: .swift
+        )
+
+        let todos = CodeAnalyser()
+            .analysTodo(in: sourceFile)
+            .unsafeRun()
+
+        XCTAssertTrue(todos.comments.isEmpty)
+    }
+
     func testParseWarnings() {
         let sourceFile = SourceFile(
             path: "/mocked",
