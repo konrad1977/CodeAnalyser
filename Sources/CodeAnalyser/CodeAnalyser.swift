@@ -146,8 +146,15 @@ extension CodeAnalyser {
         return { path in
             guard let paths = try? FileManager.default
                     .subpathsOfDirectory(atPath: path)
-                    .filter(noneOf(filter.query).contains)
-                    .filter(anyOf(supportedFiletypes.elements().map { $0.predicate }).contains)
+                    .filter(
+                        noneOf(filter.query)
+                            .intersect(other: 
+                                    anyOf(supportedFiletypes
+                                            .elements()
+                                            .map { $0.predicate }
+                                         )
+                                  ).contains
+                    )
             else { return IO { [] } }
 
             return IO { paths }
